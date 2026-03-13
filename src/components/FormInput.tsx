@@ -1,7 +1,6 @@
-"use client"
-
 import { useFormContext } from "react-hook-form"
 import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,7 +11,12 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export function FormInput({ name, label, capitalize, className, onChange, ...props }: FormInputProps) {
     const { register, setValue, formState: { errors } } = useFormContext()
+    const [isMounted, setIsMounted] = useState(false)
     const error = errors[name]
+
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     const { onChange: rOnChange, ...registration } = register(name)
 
@@ -47,14 +51,17 @@ export function FormInput({ name, label, capitalize, className, onChange, ...pro
                             : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10",
                         className
                     )}
-                    suppressHydrationWarning
+                    aria-invalid={!!error}
+                    aria-describedby={error ? `${name}-error` : undefined}
                     {...props}
                 />
-                {error && (
+                {isMounted && error && (
                     <motion.p
+                        id={`${name}-error`}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="text-xs font-medium text-red-500 mt-1.5 ml-1"
+                        role="alert"
                     >
                         {error.message as string}
                     </motion.p>

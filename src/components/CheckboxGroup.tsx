@@ -24,8 +24,8 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
     }
 
     return (
-        <div className="space-y-4 w-full">
-            <label className="text-sm font-semibold text-slate-700 block ml-1">
+        <div className="space-y-4 w-full" role="group" aria-labelledby={`${name}-label`}>
+            <label id={`${name}-label`} className="text-sm font-semibold text-slate-700 block ml-1">
                 {label}
             </label>
             <div className="grid grid-cols-1 gap-3">
@@ -36,8 +36,10 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
                             key={opt}
                             type="button"
                             onClick={() => toggleOption(opt)}
+                            role="checkbox"
+                            aria-checked={isSelected}
                             className={cn(
-                                "flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 text-left",
+                                "flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 text-left outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20",
                                 isSelected
                                     ? "border-blue-500 bg-blue-50/50 shadow-[0_0_15px_rgba(37,99,235,0.05)]"
                                     : "border-slate-100 bg-white hover:border-slate-200"
@@ -63,6 +65,7 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
                 <motion.p
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
+                    role="alert"
                     className="text-xs font-medium text-red-500 mt-2 ml-1"
                 >
                     {error.message as string}

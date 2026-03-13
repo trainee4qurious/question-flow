@@ -116,19 +116,6 @@ export default function SummaryPage() {
                         </motion.div>
                     </div>
 
-                    {/* Reading Comprehension */}
-                    <motion.div variants={item} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-slate-100 rounded-lg text-slate-600">
-                                <FileText className="w-5 h-5" />
-                            </div>
-                            <h2 className="text-xl font-bold text-slate-800">Comprehension Answer</h2>
-                        </div>
-                        <p className="text-slate-600 leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 italic">
-                            "{formData.answer || "No answer provided."}"
-                        </p>
-                    </motion.div>
-
                     {/* Improvements */}
                     <motion.div variants={item} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-3 mb-6">

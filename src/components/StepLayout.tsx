@@ -11,7 +11,7 @@ interface StepLayoutProps {
 
 export function StepLayout({ children, title, description }: StepLayoutProps) {
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center p-4 pt-16 sm:pt-24 selection:bg-blue-100">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center p-4 pt-8 sm:pt-12 selection:bg-blue-100">
             <ProgressBar />
 
             <motion.div

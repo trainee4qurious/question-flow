@@ -4,12 +4,12 @@ export const step1Schema = z.object({
     name: z.string()
         .trim()
         .min(2, 'Name must be at least 2 characters')
-        .regex(/^[^0-9]*$/, 'Name should not contain numbers'),
+        .regex(/^[a-zA-Z\s]*$/, 'Name should only contain alphabets and spaces'),
     email: z.string().trim().email('Invalid email address'),
     role: z.string()
         .trim()
         .min(2, 'Role must be at least 2 characters')
-        .regex(/^[^0-9]*$/, 'Role should not contain numbers')
+        .regex(/^[a-zA-Z\s]*$/, 'Role should only contain alphabets and spaces')
 })
 
 export const step2Schema = z.object({
