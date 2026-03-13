@@ -21,7 +21,7 @@ export function RadioGroup({ name, label, options, optionImages }: RadioGroupPro
             <label id={`${name}-label`} className="text-sm font-semibold text-slate-700 block ml-1">
                 {label}
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {options.map((opt) => {
                     const isSelected = selectedValue === opt
                     const image = optionImages?.[opt]
@@ -41,11 +41,11 @@ export function RadioGroup({ name, label, options, optionImages }: RadioGroupPro
                             )}
                         >
                             {image && (
-                                <div className="w-full aspect-square mb-4 rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
+                                <div className="w-full aspect-square max-h-40 sm:max-h-none mb-4 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 p-2">
                                     <img
                                         src={image}
                                         alt={opt}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-contain"
                                     />
                                 </div>
                             )}
