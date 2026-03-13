@@ -2,12 +2,19 @@
 
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { useEffect } from "react"
 import { useFormStore } from "@/store/formStore"
 import { CheckCircle2, RotateCcw, Home } from "lucide-react"
 
 export default function SuccessPage() {
     const router = useRouter()
-    const { resetForm } = useFormStore()
+    const { resetForm, _hasHydrated } = useFormStore()
+
+    useEffect(() => {
+        if (_hasHydrated) {
+            resetForm()
+        }
+    }, [_hasHydrated, resetForm])
 
     const handleRestart = () => {
         resetForm()
@@ -21,7 +28,6 @@ export default function SuccessPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 text-center"
             >
-
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
