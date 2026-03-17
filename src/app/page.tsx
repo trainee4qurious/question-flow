@@ -1,69 +1,50 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { step1Schema } from "@/validations/schema"
 import { useFormStore } from "@/store/formStore"
-import { Step1Data } from "@/types/formTypes"
 import { StepLayout } from "@/components/StepLayout"
-import { FormInput } from "@/components/FormInput"
 import { NavigationButtons } from "@/components/NavigationButtons"
+import { useFormGuard } from "@/hooks/useFormGuard"
+import { fetchQuestions } from "@/lib/api"
 
-export default function Step1Page() {
+import { generateStepSchema, getDefaultValues } from "@/validations/dynamicSchema"
+import { DynamicQuestion } from "@/components/DynamicQuestion"
+
+
+export default function RootPage() {
+  const { _hasHydrated, questions, isSubmitted, resetForm } = useFormStore()
   const router = useRouter()
-  const { formData, setFormData, setCurrentStep } = useFormStore()
-
-  const methods = useForm<Step1Data>({
-    resolver: zodResolver(step1Schema),
-    defaultValues: {
-      name: formData.name || "",
-      email: formData.email || "",
-      role: formData.role || ""
-    }
-  })
 
   useEffect(() => {
-    setCurrentStep(1)
-  }, [setCurrentStep])
+    if (_hasHydrated && isSubmitted) {
+      resetForm()
+    }
+  }, [_hasHydrated, isSubmitted, resetForm])
 
-  const onSubmit = (data: Step1Data) => {
-    setFormData(data)
-    router.push("/step-2")
+  useEffect(() => {
+    if (_hasHydrated) {
+      if (questions.length > 0) {
+        router.replace("/step/1")
+      }
+    }
+  }, [_hasHydrated, questions.length, router])
+
+  // If we're already hydrated and have questions, don't show the loading state
+  // as the redirect will happen almost immediately.
+  if (_hasHydrated && questions.length > 0) {
+    return null
   }
 
   return (
-    <StepLayout
-      title="Welcome! Let's get started"
-      description="Tell us a bit about yourself to personalize your experience."
-    >
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6" suppressHydrationWarning>
-          <FormInput
-            name="name"
-            label="Full Name"
-            placeholder="e.g. John Doe"
-            capitalize
-            minLength={2}
-          />
-          <FormInput
-            name="email"
-            label="Email Address"
-            type="email"
-            placeholder="john@example.com"
-          />
-          <FormInput
-            name="role"
-            label="Role"
-            placeholder="e.g. Software Engineer"
-            capitalize
-            minLength={2}
-          />
-
-          <NavigationButtons />
-        </form>
-      </FormProvider>
+    <StepLayout title="Loading..." description="Preparing your form...">
+      <div className="flex justify-center p-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
     </StepLayout>
   )
 }
+
+

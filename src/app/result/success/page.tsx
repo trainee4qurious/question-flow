@@ -4,22 +4,35 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useEffect } from "react"
 import { useFormStore } from "@/store/formStore"
-import { CheckCircle2, RotateCcw, Home } from "lucide-react"
+import { RotateCcw, Home, CheckCircle2 } from "lucide-react"
+
+import { useFormGuard } from "@/hooks/useFormGuard"
+import { SubmissionStatus } from "@/components/SubmissionStatus"
+
 
 export default function SuccessPage() {
+    const isReady = useFormGuard(999)
     const router = useRouter()
-    const { resetForm, _hasHydrated } = useFormStore()
+    const { questions, resetForm, setIsSubmitted } = useFormStore()
+
+    const successImage = questions.find(q => q.successimage)?.successimage
 
     useEffect(() => {
-        if (_hasHydrated) {
-            resetForm()
-        }
-    }, [_hasHydrated, resetForm])
+        setIsSubmitted(true)
+    }, [setIsSubmitted])
+
+    // We no longer reset on mount to prevent the guard from redirecting back to step 1
+
+    // The reset will happen when the user starts a new form or via the Step 1 guard.
+
 
     const handleRestart = () => {
         resetForm()
         router.push("/")
     }
+
+    if (!isReady) return null
+
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -28,14 +41,24 @@ export default function SuccessPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 text-center"
             >
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
-                    className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-green-600"
-                >
-                    <CheckCircle2 className="w-8 h-8" />
-                </motion.div>
+                {successImage ? (
+                    <div className="w-full aspect-square max-h-48 mb-6 rounded-3xl overflow-hidden bg-slate-50 border border-slate-100">
+                        <img
+                            src={successImage}
+                            alt="Success"
+                            className="w-full h-full object-contain p-4"
+                        />
+                    </div>
+                ) : (
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
+                        className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-green-600"
+                    >
+                        <CheckCircle2 className="w-8 h-8" />
+                    </motion.div>
+                )}
 
                 <h1 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Submission Successful</h1>
                 <p className="text-slate-500 leading-relaxed mb-10 font-medium">
@@ -51,6 +74,9 @@ export default function SuccessPage() {
                         <RotateCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
                         Start Over
                     </button>
+
+                    <SubmissionStatus />
+
 
                 </div>
             </motion.div>

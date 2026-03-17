@@ -2,25 +2,41 @@
 
 import { useFormContext } from "react-hook-form"
 import { motion } from "framer-motion"
+import { useEffect, useMemo } from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+import { Option } from "@/types/formTypes"
 
 interface CheckboxGroupProps {
     name: string
     label: string
-    options: string[]
+    description?: string
+    options: Option[]
 }
 
-export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
-    const { setValue, watch, formState: { errors } } = useFormContext()
-    const selectedValues = watch(name) || []
+export function CheckboxGroup({ name, label, description, options }: CheckboxGroupProps) {
+    const { setValue, watch, register, formState: { errors } } = useFormContext()
+    const watchedValue = watch(name)
+    const selectedValues = useMemo(() => Array.isArray(watchedValue) ? watchedValue : [], [watchedValue])
     const error = errors[name]
 
-    const toggleOption = (option: string) => {
-        const newValues = selectedValues.includes(option)
-            ? selectedValues.filter((v: string) => v !== option)
-            : [...selectedValues, option]
-        setValue(name, newValues, { shouldValidate: true })
+    // Explicitly register the field since it's a controlled component
+    useEffect(() => {
+        register(name)
+    }, [register, name])
+
+    const toggleOption = (optionValue: string) => {
+        const isSelected = selectedValues.includes(optionValue)
+        const newValues = isSelected
+            ? selectedValues.filter((v: string) => v !== optionValue)
+            : [...selectedValues, optionValue]
+
+        setValue(name, newValues, {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true
+        })
     }
 
     return (
@@ -28,14 +44,20 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
             <label id={`${name}-label`} className="text-sm font-semibold text-slate-700 block ml-1">
                 {label}
             </label>
+            {description && (
+                <p className="text-xs text-slate-500 ml-1 -mt-1 mb-2">
+                    {description}
+                </p>
+            )}
             <div className="grid grid-cols-1 gap-3">
-                {options.map((opt) => {
-                    const isSelected = selectedValues.includes(opt)
+                {options.map((opt, idx) => {
+                    const val = opt.value || opt.label
+                    const isSelected = selectedValues.includes(val)
                     return (
                         <button
-                            key={opt}
+                            key={`${val}-${idx}`}
                             type="button"
-                            onClick={() => toggleOption(opt)}
+                            onClick={() => toggleOption(val)}
                             role="checkbox"
                             aria-checked={isSelected}
                             className={cn(
@@ -49,7 +71,7 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
                                 "font-medium",
                                 isSelected ? "text-blue-700" : "text-slate-600"
                             )}>
-                                {opt}
+                                {opt.label}
                             </span>
                             <div className={cn(
                                 "w-6 h-6 rounded-md border flex items-center justify-center transition-colors",
@@ -61,6 +83,7 @@ export function CheckboxGroup({ name, label, options }: CheckboxGroupProps) {
                     )
                 })}
             </div>
+
             {error && (
                 <motion.p
                     initial={{ opacity: 0, x: -10 }}

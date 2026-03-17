@@ -1,33 +1,57 @@
-export type Step1Data = {
-    name: string
-    email: string
-    role: string
+export type QuestionType = 'input' | 'textarea' | 'dropdown' | 'checkbox' | 'radio' | 'kyc' | 'text' | 'select' | 'multi' | 'choice' | 'email' | 'mail'
+
+export interface Option {
+    label: string
+    value: string
+    image?: string
+    points?: number
 }
 
-export type Step2Data = {
-    location: 'Home' | 'Office'
+export interface Question {
+    id: string
+    step: number
+    question: string
+    description?: string
+    questiontype: QuestionType
+    options?: Option[]
+    required: boolean
+    placeholder?: string
+    minlength?: number
+    maxlength?: number
+    order: number
+    active: boolean
+    successimage?: string
+    failureimage?: string
+    points?: number
 }
 
-export type Step3Data = {
-    answer: string
-}
-
-export type Step4Data = {
-    improvements: string[]
-}
-
-export type Step5Data = {
-    finalChoice: 'Success' | 'Failure'
-}
-
-export type FormData = Step1Data & Step2Data & Step3Data & Step4Data & Step5Data
+export type FormData = Record<string, any>
 
 export type FormStore = {
-    formData: Partial<FormData>
+    formData: FormData
+    questions: Question[]
+    lastSync: number | null
+    submissionId: string | null
     currentStep: number
     _hasHydrated: boolean
     setFormData: (data: Partial<FormData>) => void
+    setQuestions: (questions: Question[]) => void
+    setSubmissionId: (id: string) => void
     setCurrentStep: (step: number) => void
     setHasHydrated: (status: boolean) => void
+    isSubmitted: boolean
+    formSessionId: string
+    submissionStatus: 'idle' | 'submitting' | 'success' | 'error'
+    submissionError: string | null
+    totalScore: number
+    isLoadingQuestions: boolean
+    setIsSubmitted: (isSubmitted: boolean) => void
+    setSubmissionStatus: (status: 'idle' | 'submitting' | 'success' | 'error', error?: string) => void
+    setTotalScore: (score: number) => void
+    setIsLoadingQuestions: (isLoading: boolean) => void
     resetForm: () => void
 }
+
+
+
+

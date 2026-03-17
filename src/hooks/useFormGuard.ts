@@ -7,7 +7,8 @@ import { useFormStore } from "@/store/formStore"
 export function useFormGuard(step: number) {
     const router = useRouter()
     const pathname = usePathname()
-    const { formData, _hasHydrated } = useFormStore()
+    const { formData, _hasHydrated, questions, isSubmitted } = useFormStore()
+
     const [isReady, setIsReady] = useState(false)
 
     useEffect(() => {
@@ -15,6 +16,22 @@ export function useFormGuard(step: number) {
         if (!_hasHydrated) return
 
         const checkGuard = () => {
+            if (questions.length === 0 && step > 1) {
+                return
+            }
+
+            // If form is already submitted, allow the result page
+            if (isSubmitted && step > 0) {
+                // If we are on a result page (step 6 in previous logic), isReady will be true
+                // We should check if the current path is NOT a result page, then redirect home
+                if (pathname.includes('/step/')) {
+                    router.replace("/")
+                    return
+                }
+                setIsReady(true)
+                return
+            }
+
             if (step === 1) {
                 setIsReady(true)
                 return
@@ -22,20 +39,19 @@ export function useFormGuard(step: number) {
 
             let isMissingData = false
 
-            if (step >= 2 && (!formData.name || !formData.email || !formData.role)) {
-                isMissingData = true
-            }
-            if (step >= 3 && !formData.location) {
-                isMissingData = true
-            }
-            if (step >= 4 && (!formData.answer || formData.answer.length < 20)) {
-                isMissingData = true
-            }
-            if (step >= 5 && (!formData.improvements || formData.improvements.length === 0)) {
-                isMissingData = true
-            }
-            if (step === 6 && !formData.finalChoice) { // 6 for summary page
-                isMissingData = true
+            // Check all steps before current step
+            for (let i = 1; i < step; i++) {
+                const stepReqQuestions = questions.filter(q => Number(q.step) === i && q.required && (String(q.active).toLowerCase() === 'true' || q.active === true))
+                const hasAnswers = stepReqQuestions.every(q => {
+                    const ans = formData[q.id]
+                    if (q.questiontype === 'checkbox' || q.questiontype === 'multi') return Array.isArray(ans) && ans.length > 0
+                    return ans !== undefined && ans !== null && ans !== ''
+                })
+
+                if (!hasAnswers) {
+                    isMissingData = true
+                    break
+                }
             }
 
             if (isMissingData && pathname !== "/") {
@@ -45,8 +61,12 @@ export function useFormGuard(step: number) {
             }
         }
 
+
+
         checkGuard()
-    }, [step, formData, router, pathname, _hasHydrated])
+    }, [step, formData, router, pathname, _hasHydrated, questions, isSubmitted])
+
 
     return isReady
 }
+

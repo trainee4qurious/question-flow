@@ -6,10 +6,11 @@ import { cn } from "@/lib/utils"
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     name: string
     label: string
+    description?: string
     capitalize?: boolean
 }
 
-export function FormInput({ name, label, capitalize, className, onChange, ...props }: FormInputProps) {
+export function FormInput({ name, label, description, capitalize, className, onChange, ...props }: FormInputProps) {
     const { register, setValue, formState: { errors } } = useFormContext()
     const [isMounted, setIsMounted] = useState(false)
     const error = errors[name]
@@ -38,6 +39,11 @@ export function FormInput({ name, label, capitalize, className, onChange, ...pro
             >
                 {label}
             </label>
+            {description && (
+                <p className="text-xs text-slate-500 ml-1 -mt-1 mb-2">
+                    {description}
+                </p>
+            )}
             <div className="relative">
                 <input
                     id={name}

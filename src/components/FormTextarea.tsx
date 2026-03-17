@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils"
 interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     name: string
     label: string
+    description?: string
     capitalize?: boolean
 }
 
-export function FormTextarea({ name, label, capitalize, className, onChange, ...props }: FormTextareaProps) {
+export function FormTextarea({ name, label, description, capitalize, className, onChange, ...props }: FormTextareaProps) {
     const { register, setValue, formState: { errors } } = useFormContext()
     const error = errors[name]
 
@@ -34,6 +35,11 @@ export function FormTextarea({ name, label, capitalize, className, onChange, ...
             >
                 {label}
             </label>
+            {description && (
+                <p className="text-xs text-slate-500 ml-1 -mt-1 mb-2">
+                    {description}
+                </p>
+            )}
             <div className="relative">
                 <textarea
                     id={name}

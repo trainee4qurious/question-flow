@@ -4,8 +4,12 @@ import { motion } from "framer-motion"
 import { useFormStore } from "@/store/formStore"
 
 export function ProgressBar() {
+    const questions = useFormStore((state) => state.questions)
     const currentStep = useFormStore((state) => state.currentStep)
-    const totalSteps = 5
+
+    if (questions.length === 0) return null
+
+    const totalSteps = Math.max(...questions.map(q => Number(q.step)), 0)
     const progress = (currentStep / totalSteps) * 100
 
     return (
